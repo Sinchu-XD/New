@@ -37,12 +37,34 @@ async def start_cmd(_, message: Message):
         file_id = message.command[1]
         db = load_db()
         if file_id in db:
-            await bot.send_document(
-                chat_id=message.chat.id,
-                document=db[file_id],
-                protect_content=True,
-                caption="🔒 This file is protected. No forwarding, no copying, no downloading."
-            )
+            media_id = db[file_id]
+
+            try:
+                # Try sending as document
+                await bot.send_document(
+                    chat_id=message.chat.id,
+                    document=media_id,
+                    protect_content=True,
+                    caption="🔒 This file is protected. No forwarding, no copying, no downloading."
+                )
+            except ValueError as e:
+                # If it's not a document, try sending as video
+                if "VIDEO" in str(e):
+                    await bot.send_video(
+                        chat_id=message.chat.id,
+                        video=media_id,
+                        protect_content=True,
+                        caption="🔒 This file is protected. No forwarding, no copying, no downloading."
+                    )
+                elif "AUDIO" in str(e):
+                    await bot.send_audio(
+                        chat_id=message.chat.id,
+                        audio=media_id,
+                        protect_content=True,
+                        caption="🔒 This file is protected. No forwarding, no copying, no downloading."
+                    )
+                else:
+                    await message.reply("❌ Unsupported media type.")
         else:
             await message.reply("❌ Invalid or expired file link.")
     else:
