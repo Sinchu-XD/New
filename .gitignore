@@ -1,0 +1,10 @@
+.env
+*.session
+*.session-journal
+Pronova/cookies.txt
+logs/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+dist/
